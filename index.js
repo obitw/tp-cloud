@@ -75,16 +75,39 @@ app.post("/todos", async (req, res) => {
 
 app.patch("/todos/:id", async (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
-  if (!status) return res.status(400).json({ error: "Status is required" });
+  const fields = req.body;
+  const keys = Object.keys(fields).filter((k) =>
+    ["title", "description", "due_date", "status"].includes(k),
+  );
+
+  if (keys.length === 0)
+    return res.status(400).json({ error: "No valid fields to update" });
+
+  const setClause = keys
+    .map((key, index) => `${key} = $${index + 1}`)
+    .join(", ");
+  const values = keys.map((key) => fields[key]);
+
   try {
     const result = await pool.query(
-      "UPDATE todos SET status = $1 WHERE id = $2 RETURNING *",
-      [status, id],
+      `UPDATE todos SET ${setClause} WHERE id = $${keys.length + 1} RETURNING *`,
+      [...values, id],
     );
     if (result.rows.length === 0)
       return res.status(404).json({ error: "Todo introuvable" });
     res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/todos/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM todos WHERE id = $1", [id]);
+    if (result.rowCount === 0)
+      return res.status(404).json({ error: "Todo introuvable" });
+    res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -106,10 +129,16 @@ app.get("/alerts", (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
+  // SSE Heartbeat (ping)
+  const heartbeat = setInterval(() => {
+    res.write(":\n\n");
+  }, 30000);
+
   const clientId = Date.now();
   clients.push({ id: clientId, res });
 
   req.on("close", () => {
+    clearInterval(heartbeat);
     clients = clients.filter((c) => c.id !== clientId);
   });
 });
