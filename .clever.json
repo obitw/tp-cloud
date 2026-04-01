@@ -1,0 +1,12 @@
+{
+  "apps": [
+    {
+      "app_id": "app_b869d626-bcdc-4b00-aa87-fafeecd6622e",
+      "org_id": "orga_e4d64185-94d8-4d10-9d26-31b39dafd743",
+      "deploy_url": "https://push-n3-par-clevercloud-customers.services.clever-cloud.com/app_b869d626-bcdc-4b00-aa87-fafeecd6622e.git",
+      "git_ssh_url": "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_b869d626-bcdc-4b00-aa87-fafeecd6622e.git",
+      "name": "todo-ilias",
+      "alias": "todo-ilias"
+    }
+  ]
+}
