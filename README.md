@@ -3,6 +3,7 @@
 Ce projet est une application de gestion de tâches (Todo List) réalisée dans le cadre d'un TP sur le PaaS Clever Cloud.
 
 ## Fonctionnalités
+
 - Gestion complète des tâches (CRUD)
 - Filtrage par statut (`pending` / `done`)
 - Liste des tâches en retard (`overdue`)
@@ -19,13 +20,17 @@ Ce projet est une application de gestion de tâches (Todo List) réalisée dans 
    ```bash
    cp .env.example .env
    ```
+   > Vous pouvez récupérer les valeurs réelles depuis Clever Cloud avec la commande :
+   > `clever env`
 
 ## Utilisation en local
 
 Démarrez le serveur :
+
 ```bash
 node index.js
 ```
+
 L'application sera accessible sur `http://localhost:3000`.
 
 ## API Endpoints
