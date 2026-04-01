@@ -73,6 +73,34 @@ app.post("/todos", async (req, res) => {
   }
 });
 
+app.patch("/todos/:id", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) return res.status(400).json({ error: "Status is required" });
+  try {
+    const result = await pool.query(
+      "UPDATE todos SET status = $1 WHERE id = $2 RETURNING *",
+      [status, id],
+    );
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Todo introuvable" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/todos/overdue", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM todos WHERE due_date < CURRENT_DATE AND status = 'pending'",
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get("/alerts", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
